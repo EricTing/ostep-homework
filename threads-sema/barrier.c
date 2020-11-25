@@ -13,7 +13,13 @@
 // other integers to track things.
 
 typedef struct __barrier_t {
-    // add semaphores and other information here
+
+  sem_t lock, move_on;
+
+  int num_threads;
+
+  int num_finished;
+
 } barrier_t;
 
 
@@ -21,11 +27,29 @@ typedef struct __barrier_t {
 barrier_t b;
 
 void barrier_init(barrier_t *b, int num_threads) {
-    // initialization code goes here
+  b->num_threads = num_threads;
+  b->num_finished = 0;
+
+  sem_init(&b->move_on, 0, 0);
+
+  sem_init(&b->lock, 0, 1);
 }
 
+// when a thread hits the barrier, it has finished the preceding code
 void barrier(barrier_t *b) {
-    // barrier code goes here
+
+  // lock and increase the number of finished thread
+  sem_wait(&b->lock);
+  b->num_finished += 1;
+  if (b->num_finished == b->num_threads) {
+    for (int i = 0; i < b->num_threads; i++) {
+      sem_post(&b->move_on);
+    }
+  }
+  sem_post(&b->lock);
+
+  // wait for signal to move on
+  sem_wait(&b->move_on);
 }
 
 //
