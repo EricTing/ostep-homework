@@ -60,6 +60,7 @@ void *worker(void *arg) {
 
 	print_info(0, args->tid, v0, v1);
 
+  /* (dst, src) */
 	vector_add(&v[v0], &v[v1]);
 
 	print_info(1, args->tid, v0, v1);
@@ -133,7 +134,7 @@ int main(int argc, char *argv[]) {
 	printf("Time: %.2f seconds\n", t2 - t1);
     }
 
-    //vector_print(&v[0], "v1");
-    //vector_print(&v[1], "v2");
+    /* vector_print(&v[0], "v1"); */
+    /* vector_print(&v[1], "v2"); */
     return 0;
 }

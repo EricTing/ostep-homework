@@ -47,3 +47,51 @@ Each program takes the same set of arguments (see main-common.c for details):
 - `-t`: Turns on timing and shows how long everything took.
 
 
+# Questions and Solutions
+
+## basic usage
+```sh
+➜  threads-bugs git:(master) ✗ ./vector-deadlock -n 2 -l 1 -v 
+->add(0, 1)
+<-add(0, 1)
+              ->add(0, 1)
+              <-add(0, 1)
+
+threads: 2 
+loop: 1 
+vector_add_order: 0 (adding v1 to v0)
+initial values of v0: {0, 0, 0 ...}
+initial values of v1: {1, 1, 1 ...}
+final values of v0: {2, 2, 2 ...}
+final values of v1: {1, 1, 1 ...}
+```
+
+## enable deadlock
+```sh
+➜  threads-bugs git:(master) ✗ ./vector-deadlock -n 2 -l 1 -v -d
+->add(0, 1)
+<-add(0, 1)
+              ->add(1, 0)
+              <-add(1, 0)
+
+vector add order for T0: adding v1 to v0
+vector add order for T1: adding v0 to v1
+possibility to deadlock due to circular wait
+```
+
+## try-wait v.s. global-order v.s. avoid-hold-and-wait
+```sh
+➜  threads-bugs git:(master) ✗ ./vector-try-wait -n 2 -l 10000000  -d  -t
+Retries: 101664246
+Time: 17.46 seconds
+➜  threads-bugs git:(master) ✗ ./vector-global-order -n 2 -l 10000000  -d  -t 
+Time: 1.78 seconds
+➜  threads-bugs git:(master) ✗ ./vector-avoid-hold-and-wait -n 2 -l 10000000  -d  -t 
+Time: 2.50 seconds
+➜  threads-bugs git:(master) ✗ ./vector-nolock -n 2 -l 10000000  -d  -t 
+Time: 35.64 seconds
+```
+* try and wait wastes time on retrying;
+* global-order is the smartest strategy with high concurrency;
+* avoid-hold-and-wait introduces a global lock and all threads must be acquired early on (at once) instead of when they are truly needed.
+* why `vector-nolock` is the slowest?
