@@ -156,11 +156,52 @@ others determine how many file operations are run against the file system
 for testing); the `-D` flag turns off corruption to, allowing you to examine an
 intact file system.
 
+# Solutions
 
+```sh
+➜  file-journaling git:(master) ✗ ./fsck.py -D -s 1
+ARG seed 1
+ARG seedCorrupt 0
+ARG numInodes 16
+ARG numData 16
+ARG numRequests 15
+ARG printFinal False
+ARG whichCorrupt -1
+ARG dontCorrupt True
 
+Final state of file system:
 
+inode bitmap 1000100110010001
+inodes       [d a:0 r:4] [] [] [] [f a:-1 r:1] [] [] [d a:10 r:2] [d a:15 r:2] [] [] [f a:-1 r:3] [] [] [] [f a:-1 r:1] 
+data bitmap  1000000000100001
+data         [(.,0) (..,0) (m,7) (a,8) (g,11)] [] [] [] [] [] [] [] [] [] [(.,7) (..,0) (m,15) (e,11)] [] [] [] [] [(.,8) (..,0) (r,4) (w,11)] 
 
+Can you figure out which files and directories exist?
+```
+Directories: / /m /a 
+Files: /m/m /m/e /a/r /a/w /g
 
+```sh
+➜  file-journaling git:(master) ✗ ./fsck.py -S 3    
+ARG seed 0
+ARG seedCorrupt 3
+ARG numInodes 16
+ARG numData 16
+ARG numRequests 15
+ARG printFinal False
+ARG whichCorrupt -1
+ARG dontCorrupt False
 
+Final state of file system:
 
+inode bitmap 1000100010000101
+inodes       [d a:0 r:4] [] [] [] [d a:12 r:2] [] [] [] [d a:6 r:2] [] [] [] [] [f a:-1 r:2] [] [f a:-1 r:2] 
+data bitmap  1000001000001000
+data         [(.,0) (..,0) (g,8) (w,4) (m,13) (z,13)] [] [] [] [] [] [(.,8) (..,0) (s,15)] [] [] [] [] [] [(.,4) (..,0)] [] [] [] 
 
+Can you figure out how the file system was corrupted?
+```
+Directories: / /g /w
+Files: /g/s /m /m -> /z
+
+Corruption: /g/s ref count should be 1 instead of 2

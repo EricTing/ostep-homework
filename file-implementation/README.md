@@ -272,3 +272,100 @@ A few other flags control various aspects of the simulation, including the
 number of inodes ("-i"), the number of data blocks ("-d"), and whether to
 print the final list of all directories and files in the file system ("-p").
 
+# Solutions
+```sh
+➜  file-implementation git:(master) ✗ ./vsfs.py -s 17  
+ARG seed 17
+ARG numInodes 8
+ARG numData 8
+ARG numRequests 10
+ARG reverse False
+ARG printFinal False
+
+Initial state
+
+inode bitmap  10000000
+inodes       [d a:0 r:2][][][][][][][]
+data bitmap   10000000
+data         [(.,0) (..,0)][][][][][][][]
+
+Which operation took place?
+mkdir("/u")
+
+inode bitmap  11000000
+inodes       [d a:0 r:3][d a:1 r:2][][][][][][]
+data bitmap   11000000
+data         [(.,0) (..,0) (u,1)][(.,1) (..,0)][][][][][][]
+
+Which operation took place?
+create("/a")
+
+inode bitmap  11100000
+inodes       [d a:0 r:3][d a:1 r:2][f a:-1 r:1][][][][][]
+data bitmap   11000000
+data         [(.,0) (..,0) (u,1) (a,2)][(.,1) (..,0)][][][][][][]
+
+Which operation took place?
+unlink("/a")
+
+inode bitmap  11000000
+inodes       [d a:0 r:3][d a:1 r:2][][][][][][]
+data bitmap   11000000
+data         [(.,0) (..,0) (u,1)][(.,1) (..,0)][][][][][][]
+
+Which operation took place?
+mkdir("/z")
+
+inode bitmap  11100000
+inodes       [d a:0 r:4][d a:1 r:2][d a:2 r:2][][][][][]
+data bitmap   11100000
+data         [(.,0) (..,0) (u,1) (z,2)][(.,1) (..,0)][(.,2) (..,0)][][][][][]
+
+Which operation took place?
+mkdir("/s")
+
+inode bitmap  11110000
+inodes       [d a:0 r:5][d a:1 r:2][d a:2 r:2][d a:3 r:2][][][][]
+data bitmap   11110000
+data         [(.,0) (..,0) (u,1) (z,2) (s,3)][(.,1) (..,0)][(.,2) (..,0)][(.,3) (..,0)][][][][]
+
+Which operation took place?
+create("/z/x")
+
+inode bitmap  11111000
+inodes       [d a:0 r:5][d a:1 r:2][d a:2 r:2][d a:3 r:2][f a:-1 r:1][][][]
+data bitmap   11110000
+data         [(.,0) (..,0) (u,1) (z,2) (s,3)][(.,1) (..,0)][(.,2) (..,0) (x,4)][(.,3) (..,0)][][][][]
+
+Which operation took place?
+link("/z/x", "/u/b")
+
+inode bitmap  11111000
+inodes       [d a:0 r:5][d a:1 r:2][d a:2 r:2][d a:3 r:2][f a:-1 r:2][][][]
+data bitmap   11110000
+data         [(.,0) (..,0) (u,1) (z,2) (s,3)][(.,1) (..,0) (b,4)][(.,2) (..,0) (x,4)][(.,3) (..,0)][][][][]
+
+Which operation took place?
+unlink("/u/b")
+
+inode bitmap  11111000
+inodes       [d a:0 r:5][d a:1 r:2][d a:2 r:2][d a:3 r:2][f a:-1 r:1][][][]
+data bitmap   11110000
+data         [(.,0) (..,0) (u,1) (z,2) (s,3)][(.,1) (..,0)][(.,2) (..,0) (x,4)][(.,3) (..,0)][][][][]
+
+Which operation took place?
+fd=open("/z/x", O_WRONLY|O_APPEND); write(fd, buf, BLOCKSIZE); close(fd);
+
+inode bitmap  11111000
+inodes       [d a:0 r:5][d a:1 r:2][d a:2 r:2][d a:3 r:2][f a:4 r:1][][][]
+data bitmap   11111000
+data         [(.,0) (..,0) (u,1) (z,2) (s,3)][(.,1) (..,0)][(.,2) (..,0) (x,4)][(.,3) (..,0)][v][][][]
+
+Which operation took place?
+creat("/u/b");
+
+inode bitmap  11111100
+inodes       [d a:0 r:5][d a:1 r:2][d a:2 r:2][d a:3 r:2][f a:4 r:1][f a:-1 r:1][][]
+data bitmap   11111000
+data         [(.,0) (..,0) (u,1) (z,2) (s,3)][(.,1) (..,0) (b,5)][(.,2) (..,0) (x,4)][(.,3) (..,0)][v][][][]
+```
