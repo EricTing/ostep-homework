@@ -211,8 +211,34 @@ Options:
                         w,filepath,offset,numblks l,srcpath,dstpath s
 ```
 
+# Solution
+```sh
+➜  file-lfs git:(master) ✗ ./lfs.py -n 3
 
+INITIAL file system contents:
+[   0 ] live checkpoint: 3 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+[   1 ] live [.,0] [..,0] -- -- -- -- -- -- 
+[   2 ] live type:dir size:1 refs:2 ptrs: 1 -- -- -- -- -- -- -- 
+[   3 ] live chunk(imap): 2 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
+create file /ku3
+write to file /ku3
+create file /qg9
 
-
-
+FINAL file system contents:
+[   0 ] ?    checkpoint: 14 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+[   1 ] ?    [.,0] [..,0] -- -- -- -- -- -- 
+[   2 ] ?    type:dir size:1 refs:2 ptrs: 1 -- -- -- -- -- -- -- 
+[   3 ] ?    chunk(imap): 2 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+[   4 ] ?    [.,0] [..,0] [ku3,1] -- -- -- -- -- 
+[   5 ] ?    type:dir size:1 refs:2 ptrs: 4 -- -- -- -- -- -- -- 
+[   6 ] ?    type:reg size:0 refs:1 ptrs: -- -- -- -- -- -- -- -- 
+[   7 ] ?    chunk(imap): 5 6 -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+[   8 ] ?    z0z0z0z0z0z0z0z0z0z0z0z0z0z0z0z0
+[   9 ] ?    type:reg size:8 refs:1 ptrs: -- -- -- -- -- -- -- 8 
+[  10 ] ?    chunk(imap): 5 9 -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+[  11 ] ?    [.,0] [..,0] [ku3,1] [qg9,2] -- -- -- -- 
+[  12 ] ?    type:dir size:1 refs:2 ptrs: 11 -- -- -- -- -- -- -- 
+[  13 ] ?    type:reg size:0 refs:1 ptrs: -- -- -- -- -- -- -- -- 
+[  14 ] ?    chunk(imap): 12 9 13 -- -- -- -- -- -- -- -- -- -- -- -- -- 
+```
